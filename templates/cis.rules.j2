@@ -19,13 +19,13 @@
 -w /etc/issue.net -p wa -k system-locale
 -w /etc/hosts -p wa -k system-locale
 -w /etc/sysconfig/network -p wa -k system-locale
-{% end if %}
+{% endif %}
 
 {% if auditd_rule_mac is defined and auditd_rule_mac is sameas true %}
 -w /etc/selinux/ -p wa -k MAC-policy
 {% endif %}
 
-{% if auditd_rule_login is defined and auditd_rule_login is sameas true }
+{% if auditd_rule_login is defined and auditd_rule_login is sameas true %}
 -w /var/log/lastlog -p wa -k logins
 -w /var/run/faillock/ -p wa -k logins
 {% endif %}
@@ -36,7 +36,7 @@
 -w /var/log/btmp -p wa -k session
 {% endif %}
 
-{% if auditd_rule_dac is defined and is sameas true %}
+{% if auditd_rule_dac is defined and auditd_rule_dac is sameas true %}
 -a always,exit -F arch=b64 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
 -a always,exit -F arch=b32 -S chmod -S fchmod -S fchmodat -F auid>=1000 -F auid!=4294967295 -k perm_mod
 -a always,exit -F arch=b64 -S chown -S fchown -S fchownat -S lchown -F auid>=1000 -F auid!=4294967295 -k perm_mod

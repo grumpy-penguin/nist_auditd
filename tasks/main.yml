@@ -1,0 +1,89 @@
+---
+# tasks file for nist_auditd
+- name: Ensure auditd is installed
+  package:
+    name: auditd
+    state: present
+  notify: auditd service
+
+- name: Ensure auditd configuration file is present
+  file:
+    path: /etc/auditd/auditd.conf
+    state: file
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Ensure audit log storage size is configured
+  lineinfile:
+    create: true
+    dest: /etc/auditd/auditd.conf
+    regexp: (?i)^[#\s]*max_log_file\s+
+    line: "max_log_file {{ rhel[auditd_max_log_file] }}"
+
+- name: Ensure a notification is sent before log capacity is reached
+  lineinfile:
+    create: true
+    dest: /etc/auditd/auditd.conf
+    regexp: (?i)^[#\s]*space_left_action\s+
+    line: "space_left_action {{ rhel[space_left_action] }}"
+
+- name: Set the accound used to send mail notifications
+  lineinfile:
+    create: true
+    dest: /etc/auditd/auditd.conf
+    regexp: (?i)^[#\s]*action_mail_acct\s+
+    line: "action_mail_acct {{ rhel[action_mail_acct] }}"
+
+- name: Set the action to take when the log space is critically low
+  lineinfile:
+    create: true
+    dest: /etc/auditd/auditd.conf
+    regexp: (?i)^[#\s]*admin_space_left_action\s+
+    line: "admin_space_left_action {{ rhel[admin_space_left_action] }}"
+
+- name: Ensure logs are maintained when max log file is reached
+  lineinfile:
+    create: true
+    dest: /etc/auditd/auditd.conf
+    regexp: (?i)^[#\s]*max_log_file_action\s+
+    line: "max_log_file_action {{ rhel[max_log_file_action] }}"
+
+- name: Ensure audit rules file exists
+  file:
+    path: /etc/audit/audit.rules
+    state: file
+    owner: root
+    group: root
+    mode: 0600
+
+- name: Ensure CIS Auditd Rules are added
+  template:
+    src: cis.rules.j2
+    dest: /etc/audit/rules.d/cis.rules
+    owner: root
+    group: root
+    mode: 0600
+    backup: True
+
+- name: Ensure auditing for processes that start prior to auditd is enabled
+  block:
+    - name: check audit argument exists
+      command: grep 'GRUB_CMDLINE_LINUX.*audit=' /etc/default/grub
+      failed_when: false
+      register: argcheck
+
+    - name: Replace value of andit directive
+      replace:
+        path: /etc/default/grub
+        regexp: audit=.
+        replace: audit=1
+      notify: update bootloader menu
+
+  rescue:
+    - name: Add key/value for audit
+      replace:
+        path: /etc/default/grub
+        regexp: (GRUB_CMDLINE_LINUX=.*)"
+        replace: \1 audit=1"
+      notify: update bootloader menu

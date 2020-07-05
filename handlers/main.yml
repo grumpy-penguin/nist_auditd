@@ -1,0 +1,10 @@
+---
+# handlers file for nist_auditd
+- name: auditd service
+  service:
+    name: auditd
+    state: restarted
+    enabled: True
+
+- name: update bootloader menu
+  command: grub2-mkconfig -o /boot/grub2/grub.cfg

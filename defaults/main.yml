@@ -1,0 +1,23 @@
+---
+# defaults file for nist_auditd
+rhel:
+  auditd_max_log_file: 20
+  space_left_action: syslog
+  action_mail_acct: root
+  admin_space_left_action: rotate
+  max_log_file_action: rotate
+
+auditd_rule_time_change: True
+auditd_rule_passwd: True
+auditd_rule_network: True
+auditd_rule_mac: True
+auditd_rule_login: True
+auditd_rule_session_init: True
+auditd_rule_dac: True
+auditd_rule_bad_file_access: True
+auditd_rule_success_mount: True
+audit_rule_file_del: True
+audid_rule_sudoers: True
+auditd_rule_sudolog: True
+auditd_rule_kernal_mod: True
+auditd_rule_immutable: True

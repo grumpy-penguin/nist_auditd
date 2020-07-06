@@ -12,6 +12,7 @@
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*max_log_file\s+
     line: "max_log_file {{ rhel['auditd_max_log_file'] }}"
+  notify: auditd service
 
 - name: Ensure a notification is sent before log capacity is reached
   lineinfile:
@@ -19,6 +20,7 @@
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*space_left_action\s+
     line: "space_left_action {{ rhel['space_left_action'] }}"
+  notify: auditd service
 
 - name: Set the accound used to send mail notifications
   lineinfile:
@@ -26,6 +28,7 @@
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*action_mail_acct\s+
     line: "action_mail_acct {{ rhel['action_mail_acct'] }}"
+  notify: auditd service
 
 - name: Set the action to take when the log space is critically low
   lineinfile:
@@ -33,6 +36,7 @@
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*admin_space_left_action\s+
     line: "admin_space_left_action {{ rhel['admin_space_left_action'] }}"
+  notify: auditd service
 
 - name: Ensure logs are maintained when max log file is reached
   lineinfile:
@@ -40,6 +44,7 @@
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*max_log_file_action\s+
     line: "max_log_file_action {{ rhel['max_log_file_action'] }}"
+  notify: auditd service
 
 - name: Ensure audit rules file exists
   file:
@@ -57,13 +62,13 @@
     group: root
     mode: 0600
     backup: True
+  notify: auditd service
 
 - name: Ensure auditing for processes that start prior to auditd is enabled
   block:
     - name: check audit argument exists
       command: grep 'GRUB_CMDLINE_LINUX.*audit=' /etc/default/grub
       changed_when: false
-      register: argcheck
 
     - name: Replace value of andit directive
       replace:

@@ -6,12 +6,28 @@
     state: present
   notify: auditd service
 
+- name: Configure auditd Number of Logs Retained
+  lineinfile:
+    create: true
+    dest: /etc/audit/auditd.conf
+    regexp: (?i)^[#\s]*num_logs\s+
+    line: "num_logs = {{ rhel['auditd_num_logs'] }}"
+  notify: auditd service
+
 - name: Ensure audit log storage size is configured
   lineinfile:
     create: true
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*max_log_file\s+
-    line: "max_log_file {{ rhel['auditd_max_log_file'] }}"
+    line: "max_log_file = {{ rhel['auditd_max_log_file'] }}"
+  notify: auditd service
+
+- name: Configure space left value
+  lineinfile:
+    create: true
+    dest: /etc/audit/auditd.conf
+    regexp: (?i)^[#\s]*space_left\s+
+    line: "space_left = {{ rhel['space_left'] }}"
   notify: auditd service
 
 - name: Ensure a notification is sent before log capacity is reached
@@ -19,7 +35,7 @@
     create: true
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*space_left_action\s+
-    line: "space_left_action {{ rhel['space_left_action'] }}"
+    line: "space_left_action = {{ rhel['space_left_action'] }}"
   notify: auditd service
 
 - name: Set the accound used to send mail notifications
@@ -27,7 +43,15 @@
     create: true
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*action_mail_acct\s+
-    line: "action_mail_acct {{ rhel['action_mail_acct'] }}"
+    line: "action_mail_acct = {{ rhel['action_mail_acct'] }}"
+  notify: auditd service
+
+- name: Configure admin space left value
+  lineinfile:
+    create: true
+    dest: /etc/audit/auditd.conf
+    regexp: (?i)^[#\s]*admin_space_left\s+
+    line: "admin_space_left = {{ rhel['admin_space_left'] }}"
   notify: auditd service
 
 - name: Set the action to take when the log space is critically low
@@ -35,7 +59,7 @@
     create: true
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*admin_space_left_action\s+
-    line: "admin_space_left_action {{ rhel['admin_space_left_action'] }}"
+    line: "admin_space_left_action = {{ rhel['admin_space_left_action'] }}"
   notify: auditd service
 
 - name: Ensure logs are maintained when max log file is reached
@@ -43,8 +67,25 @@
     create: true
     dest: /etc/audit/auditd.conf
     regexp: (?i)^[#\s]*max_log_file_action\s+
-    line: "max_log_file_action {{ rhel['max_log_file_action'] }}"
+    line: "max_log_file_action = {{ rhel['max_log_file_action'] }}"
   notify: auditd service
+
+- name: Audit data should be synchronously written to disk to ensure log integrity.
+  lineinfile:
+    create: true
+    dest: /etc/audit/auditd.conf
+    regexp: (?i)^[#\s]*flush\s+
+    line: "flush = {{ rhel['auditd_flush'] }}"
+  notify: auditd service
+
+- name: Configure auditd to use audispd's syslog plugin
+  lineinfile:
+    create: true
+    dest: /etc/audisp/plugins.d/syslog.conf
+    regexp: (?i)^[#\s]*active\s+
+    line: "active = {{ rhel['auditd_syslog'] }}"
+  notify: auditd service
+
 
 - name: Ensure audit rules file exists
   file:

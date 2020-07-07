@@ -5,6 +5,7 @@
     name: auditd
     state: restarted
     enabled: True
+    use: service
 
 - name: update bootloader menu
   command: grub2-mkconfig -o /boot/grub2/grub.cfg
